@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Yoga Timer">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Yoga Timer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #111827;
+  color: #f3f4f6;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.title { font-size: 24px; font-weight: 500; color: #f3f4f6; text-align: center; }
+.stato-box {
+  width: 100%;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  transition: background 0.3s, color 0.3s;
+}
+.stato-esercizio  { background: #14532d; color: #bbf7d0; }
+.stato-riposo     { background: #78350f; color: #fde68a; }
+.stato-completato { background: #064e3b; color: #6ee7b7; }
+.stato-pausa      { background: #1e3a5f; color: #93c5fd; }
+.stato-idle       { background: #1f2937; color: #9ca3af; }
+.timer-display {
+  font-size: 100px;
+  font-weight: 500;
+  color: #f9fafb;
+  line-height: 1;
+  letter-spacing: -4px;
+  font-variant-numeric: tabular-nums;
+  min-width: 180px;
+  text-align: center;
+}
+.progress-bar-bg { width: 100%; height: 6px; background: #374151; border-radius: 3px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.9s linear, background 0.3s; }
+.ciclo-label { font-size: 16px; color: #9ca3af; }
+.cicli-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: #374151; transition: background 0.3s; }
+.dot.done   { background: #16a34a; }
+.dot.active { background: #d97706; }
+.ciclo-stepper {
+  display: flex; align-items: center; width: 100%;
+  background: #1f2937;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid #374151;
+}
+.ciclo-stepper label { flex: 1; font-size: 14px; color: #9ca3af; padding: 0 1rem; }
+.stepper-val { font-size: 20px; font-weight: 500; color: #f3f4f6; min-width: 36px; text-align: center; }
+.stepper-btn {
+  width: 56px; height: 56px; font-size: 28px; border: none;
+  background: #111827; color: #f3f4f6;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.stepper-btn:first-child { border-right: 0.5px solid #374151; }
+.stepper-btn:last-child  { border-left:  0.5px solid #374151; }
+.stepper-btn:active { background: #374151; transform: scale(0.94); }
+.stepper-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-row { display: flex; gap: 10px; width: 100%; }
+.btn {
+  flex: 1; padding: 0.9rem 0.5rem;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 500; cursor: pointer; border: none;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-start { background: #15803d; color: #dcfce7; }
+.btn-pausa { background: #1d4ed8; color: #dbeafe; }
+.btn-reset { background: #b45309; color: #fef3c7; }
+</style>
+</head>
+<body>
+<div class="container">
+  <p class="title">🧘 Yoga Timer</p>
+  <div class="stato-box stato-idle" id="statoBox">In attesa</div>
+  <div class="timer-display" id="timerDisplay">50</div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill" style="width:100%; background:#16a34a;"></div>
+  </div>
+  <p class="ciclo-label" id="cicloLabel">Ciclo 1 / 5</p>
+  <div class="cicli-dots" id="cicliDots"></div>
+  <div class="ciclo-stepper">
+    <button class="stepper-btn" id="btnMeno" onclick="cambiaCicli(-1)" aria-label="Diminuisci cicli">−</button>
+    <label>Cicli</label>
+    <span class="stepper-val" id="stepperVal">5</span>
+    <button class="stepper-btn" id="btnPiu"  onclick="cambiaCicli(1)"  aria-label="Aumenta cicli">+</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-start" id="btnStart" onclick="startTimer()">▶ Start</button>
+    <button class="btn btn-pausa" id="btnPausa" onclick="togglePausa()" disabled>⏸ Pausa</button>
+    <button class="btn btn-reset" id="btnReset" onclick="resetTimer()">↺ Reset</button>
+  </div>
+</div>
+
+<script>
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudio() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function makeChain(ctx) {
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -12; 
+  comp.knee.value      = 3;
+  comp.ratio.value     = 8;   
+  comp.attack.value    = 0.001;
+  comp.release.value   = 0.1;
+  const master = ctx.createGain();
+  master.gain.value = 5.0; 
+  comp.connect(master);
+  master.connect(ctx.destination);
+  return comp;
+}
+
+function playDing() {
+  try {
+    const ctx = getAudio();
+    const out = makeChain(ctx);
+    [880, 1320, 1760].forEach((freq, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.connect(g); g.connect(out);
+      const t = ctx.currentTime + i * 0.06;
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(1.5, t); 
+      g.gain.exponentialRampToValueAtTime(0.001, t + 3.0); 
+      o.start(t); o.stop(t + 3.0);
+    });
+  } catch(e) {}
+}
+
+function playGong() {
+  try {
+    const ctx = getAudio();
+    const out = makeChain(ctx);
+    [110, 165, 220, 294, 370].forEach((freq, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine';
+      o.connect(g); g.connect(out);
+      const t = ctx.currentTime + i * 0.05;
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.95, t + 4.0);
+      g.gain.setValueAtTime(1.2, t); 
+      g.gain.exponentialRampToValueAtTime(0.001, t + 4.5); 
+      o.start(t); o.stop(t + 4.5);
+    });
+    const noise = ctx.createOscillator(), ng = ctx.createGain();
+    noise.type = 'sawtooth';
+    noise.frequency.value = 80;
+    noise.connect(ng); ng.connect(out);
+    ng.gain.setValueAtTime(0.6, ctx.currentTime);
+    ng.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    noise.start(); noise.stop(ctx.currentTime + 0.6);
+  } catch(e) {}
+}
+
+function playFanfare() {
+  try {
+    const ctx = getAudio();
+    const out = makeChain(ctx);
+    [523, 659, 784, 659, 1047].forEach((freq, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square';
+      o.connect(g); g.connect(out);
+      const t = ctx.currentTime + i * 0.25; 
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.8, t); 
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.8); 
+      o.start(t); o.stop(t + 0.8);
+      const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+      o2.type = 'triangle';
+      o2.frequency.value = freq * 1.5;
+      o2.connect(g2); g2.connect(out);
+      g2.gain.setValueAtTime(0.5, t);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+      o2.start(t); o2.stop(t + 0.7);
+    });
+  } catch(e) {}
+}
+
+let secondi = 50, inEsercizio = true, cicloCorrente = 1, totaleCicli = 5;
+let timerInterval = null, maxSecondi = 50, inPausa = false;
+
+function renderDots() {
+  const d = document.getElementById('cicliDots');
+  d.innerHTML = '';
+  for (let i = 1; i <= totaleCicli; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i < cicloCorrente ? ' done' : i === cicloCorrente ? ' active' : '');
+    d.appendChild(dot);
+  }
+}
+
+function aggiornaDisplay() {
+  document.getElementById('timerDisplay').textContent = secondi;
+  document.getElementById('cicloLabel').textContent = 'Ciclo ' + cicloCorrente + ' / ' + totaleCicli;
+  const fill = document.getElementById('progressFill');
+  fill.style.width = Math.round((secondi / maxSecondi) * 100) + '%';
+  const box = document.getElementById('statoBox');
+  if (inPausa) {
+    box.className = 'stato-box stato-pausa'; box.textContent = 'In pausa';
+  } else if (inEsercizio) {
+    box.className = 'stato-box stato-esercizio'; box.textContent = 'Esercizio';
+    fill.style.background = '#16a34a';
+  } else {
+    box.className = 'stato-box stato-riposo'; box.textContent = 'Riposo';
+    fill.style.background = '#d97706';
+  }
+  renderDots();
+}
+
+function cambiaCicli(delta) {
+  totaleCicli = Math.max(1, Math.min(30, totaleCicli + delta));
+  document.getElementById('stepperVal').textContent = totaleCicli;
+  document.getElementById('cicloLabel').textContent = 'Ciclo 1 / ' + totaleCicli;
+  renderDots();
+}
+
+function startTimer() {
+  totaleCicli = parseInt(document.getElementById('stepperVal').textContent) || 5;
+  cicloCorrente = 1; inEsercizio = true; secondi = 50; maxSecondi = 50; inPausa = false;
+  aggiornaDisplay(); playDing();
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnPausa').disabled = false;
+  document.getElementById('btnMeno').disabled = true;
+  document.getElementById('btnPiu').disabled = true;
+  timerInterval = setInterval(tick, 1000);
+}
+
+function togglePausa() {
+  const bp = document.getElementById('btnPausa');
+  if (!inPausa) {
+    clearInterval(timerInterval); timerInterval = null; inPausa = true;
+    bp.textContent = '▶ Riprendi';
+    bp.style.background = '#15803d'; bp.style.color = '#dcfce7';
+  } else {
+    inPausa = false;
+    bp.textContent = '⏸ Pausa';
+    bp.style.background = ''; bp.style.color = '';
+    timerInterval = setInterval(tick, 1000);
+  }
+  aggiornaDisplay();
+}
+
+function tick() {
+  secondi--;
+  if (secondi > 0) { aggiornaDisplay(); return; }
+  if (inEsercizio) {
+    playGong(); inEsercizio = false; secondi = 10; maxSecondi = 10; aggiornaDisplay();
+  } else {
+    if (cicloCorrente < totaleCicli) {
+      cicloCorrente++; inEsercizio = true; secondi = 50; maxSecondi = 50;
+      playDing(); aggiornaDisplay();
+    } else {
+      clearInterval(timerInterval); timerInterval = null; playFanfare();
+      const box = document.getElementById('statoBox');
+      box.className = 'stato-box stato-completato'; box.textContent = 'Completato!';
+      document.getElementById('timerDisplay').textContent = '0';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('btnPausa').disabled = true;
+      document.getElementById('btnMeno').disabled = false;
+      document.getElementById('btnPiu').disabled = false;
+      const bp = document.getElementById('btnPausa');
+      bp.textContent = '⏸ Pausa'; bp.style.background = ''; bp.style.color = '';
+      renderDots();
+    }
+  }
+}
+
+function resetTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  secondi = 50; maxSecondi = 50; cicloCorrente = 1; inEsercizio = true; inPausa = false;
+  totaleCicli = parseInt(document.getElementById('stepperVal').textContent) || 5;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnPausa').disabled = true;
+  document.getElementById('btnMeno').disabled = false;
+  document.getElementById('btnPiu').disabled = false;
+  const bp = document.getElementById('btnPausa');
+  bp.textContent = '⏸ Pausa'; bp.style.background = ''; bp.style.color = '';
+  document.getElementById('statoBox').className = 'stato-box stato-idle';
+  document.getElementById('statoBox').textContent = 'In attesa';
+  document.getElementById('timerDisplay').textContent = '50';
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressFill').style.background = '#16a34a';
+  document.getElementById('cicloLabel').textContent = 'Ciclo 1 / ' + totaleCicli;
+  renderDots();
+}
+
+renderDots();
+</script>
+</body>
+</html>
