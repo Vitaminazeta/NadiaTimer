@@ -23,29 +23,29 @@ body {
   max-width: 380px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.8rem;
 }
-.title { font-size: 24px; font-weight: 500; color: #f3f4f6; text-align: center; }
+.title { font-size: 20px; font-weight: 500; color: #f3f4f6; text-align: center; }
 .stato-box {
   width: 100%;
   border-radius: 14px;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   text-align: center;
   font-size: 18px;
   font-weight: 500;
   transition: background 0.3s, color 0.3s;
 }
-.stato-esercizio  { background: #14532d; color: #bbf7d0; }
-.stato-riposo     { background: #78350f; color: #fde68a; }
+.stato-esercizio { background: #14532d; color: #bbf7d0; }
+.stato-riposo { background: #78350f; color: #fde68a; }
 .stato-completato { background: #064e3b; color: #6ee7b7; }
-.stato-pausa      { background: #1e3a5f; color: #93c5fd; }
-.stato-idle       { background: #1f2937; color: #9ca3af; }
+.stato-pausa { background: #1e3a5f; color: #93c5fd; }
+.stato-idle { background: #1f2937; color: #9ca3af; }
 .timer-display {
-  font-size: 100px;
+  font-size: 76px;
   font-weight: 500;
   color: #f9fafb;
   line-height: 1;
@@ -54,12 +54,12 @@ body {
   min-width: 180px;
   text-align: center;
 }
-.progress-bar-bg { width: 100%; height: 6px; background: #374151; border-radius: 3px; overflow: hidden; }
-.progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.9s linear, background 0.3s; }
+.progress-bar-bg { width: 100%; height: 22px; background: #374151; border-radius: 11px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 11px; transition: width 0.9s linear, background 0.3s; }
 .ciclo-label { font-size: 16px; color: #9ca3af; }
-.cicli-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.dot { width: 12px; height: 12px; border-radius: 50%; background: #374151; transition: background 0.3s; }
-.dot.done   { background: #16a34a; }
+.cicli-dots { display: flex; gap: 6px; width: 100%; }
+.dot { flex: 1; height: 18px; border-radius: 9px; background: #374151; transition: background 0.3s; }
+.dot.done { background: #16a34a; }
 .dot.active { background: #d97706; }
 .ciclo-stepper {
   display: flex; align-items: center; width: 100%;
@@ -71,19 +71,19 @@ body {
 .ciclo-stepper label { flex: 1; font-size: 14px; color: #9ca3af; padding: 0 1rem; }
 .stepper-val { font-size: 20px; font-weight: 500; color: #f3f4f6; min-width: 36px; text-align: center; }
 .stepper-btn {
-  width: 56px; height: 56px; font-size: 28px; border: none;
+  width: 52px; height: 44px; font-size: 24px; border: none;
   background: #111827; color: #f3f4f6;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 .stepper-btn:first-child { border-right: 0.5px solid #374151; }
-.stepper-btn:last-child  { border-left:  0.5px solid #374151; }
+.stepper-btn:last-child { border-left: 0.5px solid #374151; }
 .stepper-btn:active { background: #374151; transform: scale(0.94); }
 .stepper-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-row { display: flex; gap: 10px; width: 100%; }
 .btn {
-  flex: 1; padding: 0.9rem 0.5rem;
+  flex: 1; padding: 0.75rem 0.5rem;
   border-radius: 12px;
   font-size: 15px; font-weight: 500; cursor: pointer; border: none;
   transition: opacity 0.15s, transform 0.1s;
@@ -99,27 +99,38 @@ body {
 </head>
 <body>
 <div class="container">
-  <p class="title">🧘 NadiaTimer</p>
-  <div class="stato-box stato-idle" id="statoBox">In attesa</div>
-  <div class="timer-display" id="timerDisplay">50</div>
-  <div class="progress-bar-bg">
-    <div class="progress-bar-fill" id="progressFill" style="width:100%; background:#16a34a;"></div>
-  </div>
-  <p class="ciclo-label" id="cicloLabel">Ciclo 1 / 5</p>
-  <div class="cicli-dots" id="cicliDots"></div>
-  <div class="ciclo-stepper">
-    <button class="stepper-btn" id="btnMeno" onclick="cambiaCicli(-1)" aria-label="Diminuisci cicli">−</button>
-    <label>Cicli</label>
-    <span class="stepper-val" id="stepperVal">5</span>
-    <button class="stepper-btn" id="btnPiu"  onclick="cambiaCicli(1)"  aria-label="Aumenta cicli">+</button>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-start" id="btnStart" onclick="startTimer()">▶ Start</button>
-    <button class="btn btn-pausa" id="btnPausa" onclick="togglePausa()" disabled>⏸ Pausa</button>
-    <button class="btn btn-reset" id="btnReset" onclick="resetTimer()">↺ Reset</button>
-  </div>
+<p class="title">🧘 NadiaTimer</p>
+<div class="stato-box stato-idle" id="statoBox">In attesa</div>
+<div class="timer-display" id="timerDisplay">50</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill" id="progressFill" style="width:100%; background:#eab308;"></div>
 </div>
-
+<p class="ciclo-label" id="cicloLabel">Ciclo 1 / 5</p>
+<div class="cicli-dots" id="cicliDots"></div>
+<div class="ciclo-stepper">
+<button class="stepper-btn" id="btnMeno" onclick="cambiaCicli(-1)" aria-label="Diminuisci cicli">−</button>
+<label>Cicli</label>
+<span class="stepper-val" id="stepperVal">5</span>
+<button class="stepper-btn" id="btnPiu" onclick="cambiaCicli(1)" aria-label="Aumenta cicli">+</button>
+</div>
+<div class="ciclo-stepper">
+<button class="stepper-btn" id="btnTempoMeno" onclick="cambiaTempo(-5)" aria-label="Diminuisci tempo ciclo">−</button>
+<label>Tempo ciclo (s)</label>
+<span class="stepper-val" id="tempoVal">60</span>
+<button class="stepper-btn" id="btnTempoPiu" onclick="cambiaTempo(5)" aria-label="Aumenta tempo ciclo">+</button>
+</div>
+<div class="ciclo-stepper">
+<button class="stepper-btn" id="btnRiposoMeno" onclick="cambiaRiposo(-5)" aria-label="Diminuisci tempo riposo">−</button>
+<label>Riposo (s)</label>
+<span class="stepper-val" id="riposoVal">10</span>
+<button class="stepper-btn" id="btnRiposoPiu" onclick="cambiaRiposo(5)" aria-label="Aumenta tempo riposo">+</button>
+</div>
+<div class="btn-row">
+<button class="btn btn-start" id="btnStart" onclick="startTimer()">▶ Start</button>
+<button class="btn btn-pausa" id="btnPausa" onclick="togglePausa()" disabled>⏸ Pausa</button>
+<button class="btn btn-reset" id="btnReset" onclick="resetTimer()">↺ Reset</button>
+</div>
+</div>
 <script>
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
@@ -132,86 +143,86 @@ function getAudio() {
 
 function makeChain(ctx) {
   const comp = ctx.createDynamicsCompressor();
-  comp.threshold.value = -12; 
-  comp.knee.value      = 3;
-  comp.ratio.value     = 8;   
-  comp.attack.value    = 0.001;
-  comp.release.value   = 0.1;
+  comp.threshold.value = -12;
+  comp.knee.value = 3;
+  comp.ratio.value = 8;
+  comp.attack.value = 0.001;
+  comp.release.value = 0.1;
   const master = ctx.createGain();
-  master.gain.value = 5.0; 
+  master.gain.value = 5.0;
   comp.connect(master);
   master.connect(ctx.destination);
   return comp;
 }
 
-function playDing() {
+// Nota singola: oscillatore principale + armonica per corpo del suono
+function nota(ctx, out, freq, tStart, durata, vol, tipo) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = tipo || 'square';
+  o.connect(g); g.connect(out);
+  o.frequency.setValueAtTime(freq, tStart);
+  g.gain.setValueAtTime(vol, tStart);
+  g.gain.exponentialRampToValueAtTime(0.001, tStart + durata);
+  o.start(tStart); o.stop(tStart + durata);
+  const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+  o2.type = 'triangle';
+  o2.frequency.value = freq * 2;
+  o2.connect(g2); g2.connect(out);
+  g2.gain.setValueAtTime(vol * 0.5, tStart);
+  g2.gain.exponentialRampToValueAtTime(0.001, tStart + durata * 0.8);
+  o2.start(tStart); o2.stop(tStart + durata * 0.8);
+}
+
+// INIZIO RIPOSO (fine dei 50s di esercizio): Sol5 ripetuto tre volte, timbro morbido
+function playRiposo() {
   try {
     const ctx = getAudio();
     const out = makeChain(ctx);
-    [880, 1320, 1760].forEach((freq, i) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle';
-      o.connect(g); g.connect(out);
-      const t = ctx.currentTime + i * 0.06;
-      o.frequency.setValueAtTime(freq, t);
-      g.gain.setValueAtTime(1.5, t); 
-      g.gain.exponentialRampToValueAtTime(0.001, t + 3.0); 
-      o.start(t); o.stop(t + 3.0);
-    });
+    const t0 = ctx.currentTime;
+    nota(ctx, out, 784, t0,        0.35, 1.1, 'triangle');
+    nota(ctx, out, 784, t0 + 0.25, 0.35, 1.1, 'triangle');
+    nota(ctx, out, 784, t0 + 0.50, 0.8,  1.1, 'triangle');
   } catch(e) {}
 }
 
-function playGong() {
+// COMPLETATO / NUOVO CICLO (fine dei 10s di riposo): Do6 ripetuto tre volte, timbro brillante
+function playCiclo() {
   try {
     const ctx = getAudio();
     const out = makeChain(ctx);
-    [110, 165, 220, 294, 370].forEach((freq, i) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine';
-      o.connect(g); g.connect(out);
-      const t = ctx.currentTime + i * 0.05;
-      o.frequency.setValueAtTime(freq, t);
-      o.frequency.exponentialRampToValueAtTime(freq * 0.95, t + 4.0);
-      g.gain.setValueAtTime(1.2, t); 
-      g.gain.exponentialRampToValueAtTime(0.001, t + 4.5); 
-      o.start(t); o.stop(t + 4.5);
-    });
-    const noise = ctx.createOscillator(), ng = ctx.createGain();
-    noise.type = 'sawtooth';
-    noise.frequency.value = 80;
-    noise.connect(ng); ng.connect(out);
-    ng.gain.setValueAtTime(0.6, ctx.currentTime);
-    ng.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-    noise.start(); noise.stop(ctx.currentTime + 0.6);
-  } catch(e) {}
-}
-
-function playFanfare() {
-  try {
-    const ctx = getAudio();
-    const out = makeChain(ctx);
-    [523, 659, 784, 659, 1047].forEach((freq, i) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'square';
-      o.connect(g); g.connect(out);
-      const t = ctx.currentTime + i * 0.25; 
-      o.frequency.setValueAtTime(freq, t);
-      g.gain.setValueAtTime(0.8, t); 
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.8); 
-      o.start(t); o.stop(t + 0.8);
-      const o2 = ctx.createOscillator(), g2 = ctx.createGain();
-      o2.type = 'triangle';
-      o2.frequency.value = freq * 1.5;
-      o2.connect(g2); g2.connect(out);
-      g2.gain.setValueAtTime(0.5, t);
-      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-      o2.start(t); o2.stop(t + 0.7);
-    });
+    const t0 = ctx.currentTime;
+    nota(ctx, out, 1047, t0,        0.35, 1.0, 'square');
+    nota(ctx, out, 1047, t0 + 0.25, 0.35, 1.0, 'square');
+    nota(ctx, out, 1047, t0 + 0.50, 0.8,  1.0, 'square');
   } catch(e) {}
 }
 
 let secondi = 50, inEsercizio = true, cicloCorrente = 1, totaleCicli = 5;
 let timerInterval = null, maxSecondi = 50, inPausa = false;
+let tempoTotale = 60;         // tempo totale del ciclo (default 60, non persistente)
+let tempoRiposo = 10;         // tempo di riposo (default 10, minimo 5, non persistente)
+function tempoEsercizio() { return tempoTotale - tempoRiposo; }
+
+function aggiornaAnteprima() {
+  document.getElementById('tempoVal').textContent = tempoTotale;
+  document.getElementById('riposoVal').textContent = tempoRiposo;
+  secondi = tempoEsercizio(); maxSecondi = tempoEsercizio();
+  document.getElementById('timerDisplay').textContent = secondi;
+}
+
+function cambiaTempo(delta) {
+  // tempo totale: minimo 30s, massimo 300s, passi da 5s
+  tempoTotale = Math.max(30, Math.min(300, tempoTotale + delta));
+  // il riposo deve restare dentro il totale lasciando almeno 5s di esercizio
+  if (tempoRiposo > tempoTotale - 5) tempoRiposo = tempoTotale - 5;
+  aggiornaAnteprima();
+}
+
+function cambiaRiposo(delta) {
+  // riposo: minimo 5s, massimo = tempo totale - 5s di esercizio, passi da 5s
+  tempoRiposo = Math.max(5, Math.min(tempoTotale - 5, tempoRiposo + delta));
+  aggiornaAnteprima();
+}
 
 function renderDots() {
   const d = document.getElementById('cicliDots');
@@ -233,10 +244,10 @@ function aggiornaDisplay() {
     box.className = 'stato-box stato-pausa'; box.textContent = 'In pausa';
   } else if (inEsercizio) {
     box.className = 'stato-box stato-esercizio'; box.textContent = 'Esercizio';
-    fill.style.background = '#16a34a';
+    fill.style.background = '#eab308';
   } else {
     box.className = 'stato-box stato-riposo'; box.textContent = 'Riposo';
-    fill.style.background = '#d97706';
+    fill.style.background = '#38bdf8';
   }
   renderDots();
 }
@@ -250,12 +261,18 @@ function cambiaCicli(delta) {
 
 function startTimer() {
   totaleCicli = parseInt(document.getElementById('stepperVal').textContent) || 5;
-  cicloCorrente = 1; inEsercizio = true; secondi = 50; maxSecondi = 50; inPausa = false;
-  aggiornaDisplay(); playDing();
+  cicloCorrente = 1; inEsercizio = true;
+  secondi = tempoEsercizio(); maxSecondi = tempoEsercizio(); inPausa = false;
+  aggiornaDisplay();
+  getAudio(); // sblocca l'audio al tocco dell'utente, senza riprodurre suoni
   document.getElementById('btnStart').disabled = true;
   document.getElementById('btnPausa').disabled = false;
   document.getElementById('btnMeno').disabled = true;
   document.getElementById('btnPiu').disabled = true;
+  document.getElementById('btnTempoMeno').disabled = true;
+  document.getElementById('btnTempoPiu').disabled = true;
+  document.getElementById('btnRiposoMeno').disabled = true;
+  document.getElementById('btnRiposoPiu').disabled = true;
   timerInterval = setInterval(tick, 1000);
 }
 
@@ -278,13 +295,14 @@ function tick() {
   secondi--;
   if (secondi > 0) { aggiornaDisplay(); return; }
   if (inEsercizio) {
-    playGong(); inEsercizio = false; secondi = 10; maxSecondi = 10; aggiornaDisplay();
+    playRiposo(); inEsercizio = false; secondi = tempoRiposo; maxSecondi = tempoRiposo; aggiornaDisplay();
   } else {
     if (cicloCorrente < totaleCicli) {
-      cicloCorrente++; inEsercizio = true; secondi = 50; maxSecondi = 50;
-      playDing(); aggiornaDisplay();
+      cicloCorrente++; inEsercizio = true;
+      secondi = tempoEsercizio(); maxSecondi = tempoEsercizio();
+      playCiclo(); aggiornaDisplay();
     } else {
-      clearInterval(timerInterval); timerInterval = null; playFanfare();
+      clearInterval(timerInterval); timerInterval = null; playCiclo();
       const box = document.getElementById('statoBox');
       box.className = 'stato-box stato-completato'; box.textContent = 'Completato!';
       document.getElementById('timerDisplay').textContent = '0';
@@ -293,6 +311,10 @@ function tick() {
       document.getElementById('btnPausa').disabled = true;
       document.getElementById('btnMeno').disabled = false;
       document.getElementById('btnPiu').disabled = false;
+      document.getElementById('btnTempoMeno').disabled = false;
+      document.getElementById('btnTempoPiu').disabled = false;
+      document.getElementById('btnRiposoMeno').disabled = false;
+      document.getElementById('btnRiposoPiu').disabled = false;
       const bp = document.getElementById('btnPausa');
       bp.textContent = '⏸ Pausa'; bp.style.background = ''; bp.style.color = '';
       renderDots();
@@ -302,19 +324,24 @@ function tick() {
 
 function resetTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  secondi = 50; maxSecondi = 50; cicloCorrente = 1; inEsercizio = true; inPausa = false;
+  secondi = tempoEsercizio(); maxSecondi = tempoEsercizio();
+  cicloCorrente = 1; inEsercizio = true; inPausa = false;
   totaleCicli = parseInt(document.getElementById('stepperVal').textContent) || 5;
   document.getElementById('btnStart').disabled = false;
   document.getElementById('btnPausa').disabled = true;
   document.getElementById('btnMeno').disabled = false;
   document.getElementById('btnPiu').disabled = false;
+  document.getElementById('btnTempoMeno').disabled = false;
+  document.getElementById('btnTempoPiu').disabled = false;
+  document.getElementById('btnRiposoMeno').disabled = false;
+  document.getElementById('btnRiposoPiu').disabled = false;
   const bp = document.getElementById('btnPausa');
   bp.textContent = '⏸ Pausa'; bp.style.background = ''; bp.style.color = '';
   document.getElementById('statoBox').className = 'stato-box stato-idle';
   document.getElementById('statoBox').textContent = 'In attesa';
-  document.getElementById('timerDisplay').textContent = '50';
+  document.getElementById('timerDisplay').textContent = secondi;
   document.getElementById('progressFill').style.width = '100%';
-  document.getElementById('progressFill').style.background = '#16a34a';
+  document.getElementById('progressFill').style.background = '#eab308';
   document.getElementById('cicloLabel').textContent = 'Ciclo 1 / ' + totaleCicli;
   renderDots();
 }
